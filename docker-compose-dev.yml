@@ -7,12 +7,12 @@ services:
       ports:
         - "127.0.0.1:27017:27017/tcp"
       volumes:
-        - ${DATA_DIR:-/var/kentech/afb}/db:/data/db:cached
+        - ${DATA_DIR:-$HOME/afb/var}/db:/data/db:cached
 
     server:
       build:
         context: .
-        dockerfile: ${SRC_DIR:-/usr/local/src}/atomic-fishbowl-server/Dockerfile-dev
+        dockerfile: ${SRC_DIR:-$HOME/src}/atomic-fishbowl-server/Dockerfile-dev
         args:
           NODE_VERSION: ${NODE_VERSION:-16.15.0}
       environment:
@@ -29,15 +29,15 @@ services:
       stdin_open: true
       tty: true
       volumes:
-        - ${SRC_DIR:-/usr/local/src}:/home/node/src:cached
-        - ${CONF_DIR:-/etc/kentech/afb}:/etc/kentech/afb:rw,z
-        - ${DATA_DIR:-/var/kentech/afb}/collections:/var/kentech/afb/collections:rw,z,cached
-        - ${DATA_DIR:-/var/kentech/afb}/server:/var/kentech/afb/server:rw,z,cached
+        - ${SRC_DIR:-$HOME/src}:/home/node/src:cached
+        - ${CONF_DIR:-$HOME/afb/etc}/certificates:/etc/kentech/afb/certificates:rw,z
+        - ${DATA_DIR:-$HOME/afb/var}/collections:/var/kentech/afb/collections:rw,z,cached
+        - ${DATA_DIR:-$HOME/afb/var}/server:/var/kentech/afb/server:rw,z,cached
 
     client:
       build:
         context: .
-        dockerfile: ${SRC_DIR:-/usr/local/src}/atomic-fishbowl-client/Dockerfile-dev
+        dockerfile: ${SRC_DIR:-$HOME/src}/atomic-fishbowl-client/Dockerfile-dev
       restart: unless-stopped
       deploy:
         restart_policy:
@@ -45,12 +45,12 @@ services:
       stdin_open: true
       tty: true
       volumes:
-        - ${SRC_DIR:-/usr/local/src}:/home/node/src:cached
+        - ${SRC_DIR:-$HOME/src}:/home/node/src:cached
 
     nginx:
       build:
         context: .
-        dockerfile: ${SRC_DIR:-/usr/local/src}/atomic-fishbowl-client/Dockerfile-nginx-dev
+        dockerfile: ${SRC_DIR:-$HOME/src}/atomic-fishbowl-client/Dockerfile-nginx-dev
         args:
           NGINX_VERSION: ${NGINX_VERSION:-1.22.0}
       ports:
@@ -60,8 +60,6 @@ services:
       # command: ["wait-for-it", "-t", "0", "server:3002", "--", "nginx-debug", "-g", "daemon off;"]
       command: ["wait-for-it", "-t", "0", "server:3002", "--", "nginx", "-g", "daemon off;"]
       volumes:
-        - ${SRC_DIR:-/usr/local/src}/atomic-fishbowl-client/nginx.conf.dev:/etc/nginx/nginx.conf:ro
-        - ${CONF_DIR:-/etc/kentech/afb}/certificates/ssl.cer:/etc/nginx/ssl.cer:ro
-        - ${CONF_DIR:-/etc/kentech/afb}/certificates/ssl.key:/etc/nginx/ssl.key:ro
-        - ${CONF_DIR:-/etc/kentech/afb}/certificates/jwt.pem:/etc/nginx/jwt.pem:ro
-        - ${DATA_DIR:-/var/kentech/afb}/collections:/var/kentech/afb/collections:cached
+        - ${SRC_DIR:-$HOME/src}/atomic-fishbowl-client/nginx.conf.dev:/etc/nginx/nginx.conf:ro
+        - ${CONF_DIR:-$HOME/afb/etc}/certificates:/etc/nginx/certificates:ro,z
+        - ${DATA_DIR:-$HOME/afb/var}/collections:/var/kentech/afb/collections:z,cached

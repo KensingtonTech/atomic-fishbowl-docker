@@ -2,45 +2,58 @@
 set -e
 source .env-dev
 
-PWD=$(pwd)
+ORIGPWD=$(pwd)
 CLIENT_DIR="${SRC_DIR}/atomic-fishbowl-client"
 SERVER_DIR="${SRC_DIR}/atomic-fishbowl-server"
 CLIENT_REPO="https://github.com/KensingtonTech/atomic-fishbowl-client.git"
 SERVER_REPO="https://github.com/KensingtonTech/atomic-fishbowl-server.git"
 
-if [ ! -e "${SRC_DIR}"  ]; then
-  echo "The base source directory was not found, as defined by .env-dev :"
-  echo "SRC_DIR: ${SRC_DIR}"
-  echo "\nThis probably shouldn't be the case.  Our default of /usr/local/src should already exist in most Linux environments.  Please create this directory or another suitable source location before continuing."
-  echo "Feel free to update .env-dev to configure an alternate location"
-  exit 1
-fi
-
-create_conf_dir () {
-  echo "The configuration directory was not found, as defined by .env-dev :"
-  echo "CONF_DIR: ${CONF_DIR}"
-  echo "\nWould you like this script to attempt to create it?"
+create_src_dir () {
+  echo "The source directory was not found, as defined by .env-dev :"
+  echo -e "SRC_DIR: ${SRC_DIR}\n"
   local res
-  read -p 'y/N: ' res
+  read -p 'Would you like me to create it? (y/N): ' res
   res=${res:-N}
   res=$(echo $res | awk '{print tolower($0)}')
   if [[ $res = "y" || $res = "yes" ]]; then
-    mkdir -p "${CONF_DIR}"
+    mkdir -p "${SRC_DIR}"
+  else
+    exit 1
+  fi
+}
+
+create_conf_dir () {
+  echo "The configuration directory was not found, as defined by .env-dev :"
+  echo -e "CONF_DIR: ${CONF_DIR}\n"
+  local res
+  read -p 'Would you like me to create it? (y/N): ' res
+  res=${res:-N}
+  res=$(echo $res | awk '{print tolower($0)}')
+  if [[ $res = "y" || $res = "yes" ]]; then
+    mkdir -p "${CONF_DIR}"/certificates
+  else
+    exit 1
   fi
 }
 
 create_data_dir () {
   echo "The data directory was not found, as defined by .env-dev :"
-  echo "DATA_DIR: ${DATA_DIR}"
-  echo "\nWould you like this script to attempt to create it?"
+  echo -e "DATA_DIR: ${DATA_DIR}\n"
   local res
-  read -p 'y/N: ' res
+  read -p 'Would you like me to create it? (y/N): ' res
   res=${res:-N}
   res=$(echo $res | awk '{print tolower($0)}')
   if [[ $res = "y" || $res = "yes" ]]; then
-    mkdir -p "${DATA_DIR}"
+    mkdir -p "${DATA_DIR}"/collections
+    mkdir -p "${DATA_DIR}"/server
+  else
+    exit 1
   fi
 }
+
+if [ ! -e "${SRC_DIR}"  ]; then
+  create_src_dir
+fi
 
 if [ ! -e "${CONF_DIR}" ]; then
   create_conf_dir
@@ -52,17 +65,15 @@ fi
 
 if [ ! -e "${CLIENT_DIR}"  ]; then
   echo "Cloning client to ${CLIENT_DIR}"
-  cd "${SRC_DIR}" \
-  && git clone "${CLIENT_REPO}"
+  cd "${SRC_DIR}"
+  git clone "${CLIENT_REPO}"
 fi
 
 if [ ! -e "${SERVER_DIR}"  ]; then
   echo "Cloning server to ${SERVER_DIR}"
-  cd "${SRC_DIR}" \
-  && git clone "${SERVER_REPO}"
+  cd "${SRC_DIR}"
+  git clone "${SERVER_REPO}"
 fi
-
-cd "${PWD}"
 
 # Test for Docker compose v2
 set +e
@@ -72,5 +83,6 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-set -x
+set -e
+cd $ORIGPWD
 docker compose --env-file .env-dev -f docker-compose-dev.yml up -d

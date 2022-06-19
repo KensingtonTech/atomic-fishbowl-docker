@@ -1,13 +1,26 @@
 # Atomic Fishbowl Docker
 
-This repo contains Docker Compose definitions for Atomic Fishbowl, meaning that you can stand up a production and/or development environment for Atomic Fishbowl.
+This repo contains Docker Compose definitions for Atomic Fishbowl.  That means you can stand up a production and/or development environment for Atomic Fishbowl.
 
 Docker images can be found at:
 
 * [Server Image](https://hub.docker.com/repository/docker/kensingtontech/atomic-fishbowl-server)
 * [Client Nginx Image](https://hub.docker.com/repository/docker/kensingtontech/atomic-fishbowl-nginx)
 
-To stand up a production environment:
+## Prerequisites
+
+* Docker with Compose v2
+* A functioning NetWitness installation with a Packet Decoder
+
+## Production Environment
+
+A production environment uses a Docker volume to store its data, and is comprised of three containers:
+
+* Server
+* Nginx
+* Database
+
+### To stand up a production environment:
 ```
 ./up.sh
 ```
@@ -32,9 +45,14 @@ The following environment variables can be set in files `.env` or `.env-dev`:
 
 ## Development Environment
 
-For your convenience, a containerised development environment is provided.  It uses separate containers for the server, client and Nginx.  This is distinct from a production environment, which only has server and Nginx containers.
+For your convenience, a containerised development environment is provided, intended for use with VS Code.  It is comprised of four containers
 
-To bring up the dev environment:
+* Server
+* Client
+* Nginx
+* Database
+
+### To stand up the development environment:
 ```
 ./up-dev.sh
 ```
@@ -48,14 +66,14 @@ The script will prompt you to create any missing directories.
 
 In our dev environment, the source code lives on the host filesystem, and is mapped into the containers by Docker compose.  The script will automatically download the appropriate Github repos using git if they do not already exist.
 
-Note that the entire source code dir is mapped into each container, which defaults to `/usr/local/src`.
+Note that the entire source code dir is mapped into each container, which defaults to `$HOME/src`.
 
 The dev environment uses the host local filesystem for AFB's certificates and data.
 
 The locations, from `.env-dev` are:
 ```
-CONF_DIR=/etc/kentech/afb
-DATA_DIR=/var/kentech/afb
+CONF_DIR=$HOME/afb/etc
+DATA_DIR=$HOME/afb/var
 ```
 
 #### TOP TIP
