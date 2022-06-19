@@ -1,0 +1,28 @@
+services:
+
+    db:
+      image: mongo:${MONGO_VERSION:-5.0.9}
+      restart: unless-stopped
+      deploy:
+        restart_policy:
+          condition: on-failure
+      stdin_open: true
+      tty: true
+
+    server:
+      image: kensingtontech/atomic-fishbowl-server:${SERVER_VERSION:-latest}
+      restart: unless-stopped
+      deploy:
+        restart_policy:
+          condition: on-failure
+      stdin_open: true
+      tty: true
+
+    nginx:
+      image: kensingtontech/atomic-fishbowl-nginx:${CLIENT_VERSION:-latest}
+      restart: unless-stopped
+      deploy:
+        restart_policy:
+          condition: on-failure
+      stdin_open: true
+      tty: true

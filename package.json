@@ -1,0 +1,22 @@
+{
+  "name": "atomic-fishbowl-docker",
+  "version": "1.0.3",
+  "description": "",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "up": "docker compose --env-file .env -f ./docker-compose.yml up -d",
+    "up-dev": "docker compose --env-file .env-dev -f ./docker-compose-dev.yml up -d",
+    "down": "docker compose --env-file .env down -f ./docker-compose.yml .",
+    "down-dev": "docker compose --env-file .env-dev down -f ./docker-compose-dev.yml ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KensingtonTech/atomic-fishbowl-docker.git"
+  },
+  "author": "Kensington Technology Associates",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/KensingtonTech/atomic-fishbowl-docker/issues"
+  },
+  "homepage": "https://github.com/KensingtonTech/atomic-fishbowl-docker#readme"
+}

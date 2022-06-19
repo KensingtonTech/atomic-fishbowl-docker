@@ -1,0 +1,45 @@
+volumes:
+  db:
+  certificates:
+  collections:
+  server:
+
+services:
+
+    db:
+      extends:
+        file: docker-compose-base.yml
+        service: db
+      environment:
+        MONGO_INITDB_ROOT_USERNAME: afb-server
+        MONGO_INITDB_ROOT_PASSWORD: kentech0
+      volumes:
+        - db:/data/db:cached
+
+    server:
+      extends:
+        file: docker-compose-base.yml
+        service: server
+      environment:
+        LOG_LEVEL: ${LOG_LEVEL:-info}
+        MONGO_HOST: ${MONGO_HOST:-db}
+        MONGO_PORT: ${MONGO_PORT:-27017}
+        MONGO_AUTH: ${MONGO_AUTH:-true}
+        MONGO_USER: ${MONGO_USER:-afb-server}
+        MONGO_PASSWORD: ${MONGO_PASSWORD:-kentech0}
+        SSL_CERT_HOSTNAME: ${SSL_CERT_HOSTNAME:-afb.kensington.local}
+        SSL_CERT_ALT_HOSTNAME: ${SSL_CERT_ALT_HOSTNAME:-afb}
+      volumes:
+        - certificates:/etc/kentech/afb/certificates
+        - collections:/var/kentech/afb/collections:cached
+        - server:/var/kentech/afb/server:cached
+
+    nginx:
+      extends:
+          file: docker-compose-base.yml
+          service: nginx
+      ports:
+        - "${NGINX_PORT:-443}:443/tcp"
+      volumes:
+        - collections:/var/kentech/afb/collections:cached
+        - certificates:/etc/nginx/certificates:ro
