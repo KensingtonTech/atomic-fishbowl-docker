@@ -30,6 +30,9 @@ Bring it down with:
 ./down.sh
 ```
 
+### Login
+The default login credentials are `admin` / `kentech0`
+
 
 ## Atomic Fishbowl Repositories
 * [Atomic Fishbowl Project Home](https://github.com/KensingtonTech/atomic-fishbowl)
